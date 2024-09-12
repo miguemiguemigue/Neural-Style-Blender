@@ -6,6 +6,9 @@ from PIL import Image
 import io
 import base64
 
+# check gpu is being used
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+
 app = Flask(__name__)
 # Allow CORS temporarily
 CORS(app)
@@ -19,16 +22,12 @@ vgg = tf.keras.applications.VGG19(include_top=False,
                                   weights='../model/vgg_pretrained/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5')
 vgg.trainable = False
 
-#tf.config.run_functions_eagerly(True)
-
 STYLE_LAYERS = [
     ('block1_conv1', 0.2),
     ('block2_conv1', 0.2),
     ('block3_conv1', 0.2),
     ('block4_conv1', 0.2),
     ('block5_conv1', 0.2)]
-
-
 
 @app.route("/nst", methods=["POST"])
 def nst_inference():
@@ -85,14 +84,14 @@ def nst_inference():
     images_to_return_list.append(tensor_to_image(generated_image))
 
     # Train for the specified number of epochs and save intermediate images
-    epochs = 100
+    epochs = 5000
     checkpoints = [1, 25, 50, 75, 100]
     for i in range(1, epochs + 1):
         train_step(generated_image)
         print('Epoch {}...'.format(i))
 
         # save images at checkpoints
-        if i in checkpoints:
+        if i%100==0:
             images_to_return_list.append(tensor_to_image(generated_image))
 
     # Convert the generated images to base64
