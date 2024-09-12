@@ -1,6 +1,8 @@
 # Neural Style Blender
 
-This project implements Artistic Style Transfer using neural networks. It provides two implementations using different frameworks: PyTorch and TensorFlow. 
+This project implements Artistic Style Transfer using neural networks. I've implemented it both in Tensorflow and PyTorch. 
+
+A cool approach here is how custom cost functions are used—not to optimize weights, but rather to update the generated image itself during each iteration.
 
 ## Table of Contents
 
@@ -15,11 +17,11 @@ This project implements Artistic Style Transfer using neural networks. It provid
 
 ![Example Image](data/examples/example_1.png)
 
-This project is based on the paper ["A Neural Algorithm of Artistic Style"](https://arxiv.org/abs/1508.06576) by Leon A. Gatys, Alexander S. Ecker, and Matthias Bethge. The paper introduces a novel approach to artistic style transfer, where the style of one image can be applied to the content of another using neural networks.
+This project is based on the paper ["A Neural Algorithm of Artistic Style"](https://arxiv.org/abs/1508.06576). This paper propose an approach to artistic style transfer, where the style of one image can be applied to the content of another using neural networks.
 
 ## Models and Features
 
-The project uses the VGG19 model, a pre-trained convolutional neural network, to extract features from images. These features are then used to compute the content and style costs, which guide the optimization process to blend the style of one image with the content of another.
+I've used the pre-trained VGG19 model to extract features from images. These features are then used to compute the content and style costs, which guide the optimization process to blend the style of one image with the content of another.
 
 ### VGG19 Model
 
