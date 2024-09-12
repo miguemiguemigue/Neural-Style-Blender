@@ -4,6 +4,8 @@ This project implements Artistic Style Transfer using neural networks. I've impl
 
 A cool approach here is how custom cost functions are used—not to optimize weights, but rather to update the generated image itself during each iteration.
 
+![Example Image](data/examples/example_2.png)
+
 ## Table of Contents
 
 1. [Introduction](#introduction)
@@ -14,8 +16,6 @@ A cool approach here is how custom cost functions are used—not to optimize wei
 6. [License](#license)
 
 ## Introduction
-
-![Example Image](data/examples/example_1.png)
 
 This project is based on the paper ["A Neural Algorithm of Artistic Style"](https://arxiv.org/abs/1508.06576). This paper propose an approach to artistic style transfer, where the style of one image can be applied to the content of another using neural networks.
 
