@@ -50,6 +50,8 @@ $$ J_{total} = \alpha \cdot J_{content} + \beta \cdot J_{style} $$
 
 Where \(\alpha\) and \(\beta\) are hyperparameters that balance the importance of content and style.
 
+![Example Image](data/diagram/diagram.png)
+
 ## Setup and Installation
 
 To run the project, follow these steps:
