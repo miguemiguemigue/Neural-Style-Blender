@@ -1,4 +1,4 @@
-# Style Blender
+# Neural Style Blender
 
 This project implements Neural Style Transfer (NST) using a custom model based on VGG. It allows users to upload content and style images via a web interface and apply the style of one image onto another.
 
