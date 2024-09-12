@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Style Transfer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .image-preview {
+            background-size: contain; /* Ensures the entire image fits within the container */
+            background-position: center; /* Centers the image */
+            background-repeat: no-repeat; /* Prevents image repetition */
+        }
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .content-image-preview {
+            height: 400px; /* Fixed height for content images */
+            width: auto; /* Maintain aspect ratio */
+            background-size: contain; /* Ensure proper scaling */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Prevent repetition */
+        }
+        .generated-image-preview {
+            height: 400px; /* Fixed size for generated images */
+            width: 400px; /* Fixed size for generated images */
+            max-width: 100%; /* Ensure responsiveness */
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-8 text-indigo-700">Style Blender</h1>
+
+        <form id="nstForm" class="mb-12">
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-indigo-600">Content image</h2>
+                    <div id="contentPreview" class="content-image-preview bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                        Preview content
+                    </div>
+                    <input type="file" id="contentImage" name="contentImage" accept="image/*" required class="mt-4 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-semibold mb-4 text-indigo-600">Style image</h2>
+                    <div id="stylePreview" class="content-image-preview bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                        Style preview
+                    </div>
+                    <input type="file" id="styleImage" name="styleImage" accept="image/*" required class="mt-4 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" id="generateButton" class="bg-green-500 text-white py-3 px-8 rounded-lg text-xl font-semibold hover:bg-green-600 transition duration-300 transform hover:scale-105">
+                    Generate image
+                </button>
+            </div>
+        </form>
+
+        <div id="loadingOverlay" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+            <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                <div class="spinner mb-4"></div>
+                <p class="text-lg font-semibold">Blending images...</p>
+            </div>
+        </div>
+
+        <div id="generatedImagesSection" class="hidden">
+            <h2 class="text-3xl font-bold text-center mb-8 text-indigo-700">Generated images</h2>
+            <div id="generatedImagesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Generated images will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show image previews
+        function handleImagePreview(inputId, previewId) {
+            document.getElementById(inputId).addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                const preview = document.getElementById(previewId);
+                preview.innerHTML = '';
+                preview.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
+            });
+        }
+
+        handleImagePreview('contentImage', 'contentPreview');
+        handleImagePreview('styleImage', 'stylePreview');
+
+        // Handle form submission
+        document.getElementById('nstForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            const contentImage = document.getElementById('contentImage').files[0];
+            const styleImage = document.getElementById('styleImage').files[0];
+
+            formData.append('contentImage', contentImage);
+            formData.append('styleImage', styleImage);
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            document.getElementById('generateButton').disabled = true;
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/nst', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Response has base64 encoded images
+                    const images = data.images;
+
+                    // Clear existing generated images
+                    const container = document.getElementById('generatedImagesContainer');
+                    container.innerHTML = '';
+
+                    // Create and insert new image elements
+                    images.forEach((image, index) => {
+                        const imgElement = document.createElement('div');
+                        imgElement.className = 'generated-image-preview bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 shadow-md';
+                        imgElement.style.backgroundImage = `url(data:image/jpeg;base64,${image})`;
+                        imgElement.innerHTML = `Image ${index + 1}`;
+                        container.appendChild(imgElement);
+                    });
+
+                    // Show the generated images section
+                    document.getElementById('generatedImagesSection').classList.remove('hidden');
+                } else {
+                    console.error('Error generating styled image');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('generateButton').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
