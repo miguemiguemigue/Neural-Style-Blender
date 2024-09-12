@@ -6,7 +6,7 @@ A cool approach here is how custom cost functions are used—not to optimize wei
 
 ![Example Image](data/examples/example_2.png)
 
-## Table of Contents
+## Index
 
 1. [Introduction](#introduction)
 2. [Models and Features](#models-and-features)
