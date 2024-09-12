@@ -20,4 +20,4 @@ RUN pip install -r requirements.txt
 EXPOSE 5000
 
 # Comando para correr la aplicación
-CMD ["python", "app.py"]
+CMD ["python", "app_pytorch.py"]
