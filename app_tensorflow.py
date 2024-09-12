@@ -17,9 +17,10 @@ CORS(app)
 img_size = 400
 
 # Load VGG19 pre-trained model
-vgg = tf.keras.applications.VGG19(include_top=False,
-                                  input_shape=(img_size, img_size, 3),
-                                  weights='../model/vgg_pretrained/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5')
+# vgg = tf.keras.applications.VGG19(include_top=False,
+#                                   input_shape=(img_size, img_size, 3),
+#                                   weights='./models/tensorflow/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5')
+vgg = tf.keras.applications.VGG19(include_top=False, input_shape=(img_size, img_size, 3))
 vgg.trainable = False
 
 STYLE_LAYERS = [

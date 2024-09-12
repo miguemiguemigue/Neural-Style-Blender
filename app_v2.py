@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import os
 from utils.config_loader import load_config
 
 app = Flask(__name__)
@@ -8,9 +7,9 @@ app = Flask(__name__)
 mode = load_config()
 
 if mode == 'tensorflow':
-    from models.tensorflow_model import load_vgg_model, run_style_transfer
+    from models.tensorflow.tensorflow_model import load_vgg_model, run_style_transfer
 elif mode == 'pytorch':
-    from models.pytorch_model import load_vgg_model, run_style_transfer
+    from models.pytorch.pytorch_model import load_vgg_model, run_style_transfer
 else:
     raise ValueError(f"Unknown mode: {mode}. Must be 'tensorflow' or 'pytorch'.")
 
