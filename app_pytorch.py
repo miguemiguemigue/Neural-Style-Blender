@@ -46,7 +46,7 @@ def gram_matrix(tensor):
 @app.route("/nst", methods=["POST"])
 def nst_inference():
     # Train step to optimize generated image
-    def train_step(generated_image, content_features, style_grams, optimizer):
+    def train_step(generated_image, content_features, style_grams, optimizer, alpha, beta):
         optimizer.zero_grad()
 
         generated_features = get_features(generated_image, vgg, layers=STYLE_LAYERS + CONTENT_LAYER)
@@ -60,13 +60,20 @@ def nst_inference():
             layer_style_loss = torch.mean((gen_gram - style_gram) ** 2)
             style_loss += layer_style_loss / (generated_features[layer].nelement())
 
-        alpha = 10
-        beta = 40
         total_loss = content_loss * alpha + style_loss * beta
         total_loss.backward(retain_graph=True)
         optimizer.step()
 
         return total_loss
+
+    # Parse alpha and beta from the request, default to 10 and 40 if not provided
+    try:
+        alpha = float(request.form.get('contentValue', '10'))  # Content weight
+        beta = float(request.form.get('styleValue', '40'))    # Style weight
+    except:
+        # If parsing fails, set to defaults
+        alpha = 10
+        beta = 40
 
     # Get images from request
     content_image = request.files['contentImage'].read()
@@ -74,6 +81,7 @@ def nst_inference():
 
     content_image = preprocess_image(content_image).to(device)
     style_image = preprocess_image(style_image).to(device)
+
 
     # Generate initial image. It's the one to optimize in the training steps
     generated_image = content_image.clone().requires_grad_(True)
@@ -91,17 +99,31 @@ def nst_inference():
     images_to_return_list = []
 
     # Add initial noisy image
-    images_to_return_list.append(tensor_to_image(generated_image))
+    #images_to_return_list.append(tensor_to_image(generated_image))
 
     # Train and save intermediate images
-    epochs = 1000
+    epochs = 300
+
+    num_images_to_return = 3
+    if num_images_to_return > 1:
+        interval = epochs // (num_images_to_return - 1)
+    else:
+        interval = epochs  # Only send last image
+
+
+    interval = epochs // (num_images_to_return - 1) if num_images_to_return > 1 else epochs
     for epoch in range(1, epochs + 1):
-        loss = train_step(generated_image, content_features, style_grams, optimizer)
+        loss = train_step(generated_image, content_features, style_grams, optimizer, alpha, beta)
         print(f'Epoch {epoch}, Loss: {loss.item()}')
 
-        if epoch % 100 == 0:
-            images_to_return_list.append(tensor_to_image(generated_image))
-
+        if num_images_to_return > 1:
+            # Add start, end and intermediate images
+            if epoch == 1 or epoch == epochs or (epoch - 1) % interval == 0:
+                images_to_return_list.append(tensor_to_image(generated_image))
+        else:
+            # Just send last image
+            if epoch == epochs:
+                images_to_return_list.append(tensor_to_image(generated_image))
     # Convert the generated images to base64
     images_base64 = []
     for img in images_to_return_list:
@@ -111,7 +133,7 @@ def nst_inference():
         img_base64 = base64.b64encode(img_io.read()).decode('utf-8')
         images_base64.append(img_base64)
 
-    # Devolver las imágenes como JSON
+    # Return images as JSON
     return jsonify({"images": images_base64})
 
 def preprocess_image(image_data):

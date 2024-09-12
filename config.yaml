@@ -1,1 +1,1 @@
-mode: tensorflow  # use "tensorflow" or "pytorch"
+mode: pytorch  # use "tensorflow" or "pytorch"
