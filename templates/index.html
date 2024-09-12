@@ -5,15 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neural Style Transfer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #f0f0f0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
         .image-preview {
-            background-size: contain; /* Ensures the entire image fits within the container */
-            background-position: center; /* Centers the image */
-            background-repeat: no-repeat; /* Prevents image repetition */
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: all 0.3s ease;
         }
         .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
+            border: 5px solid #e0e0e0;
+            border-top: 5px solid #2c3e50;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -24,66 +34,159 @@
             100% { transform: rotate(360deg); }
         }
         .content-image-preview {
-            height: 400px; /* Fixed height for content images */
-            width: auto; /* Maintain aspect ratio */
-            background-size: contain; /* Ensure proper scaling */
-            background-position: center; /* Center the image */
-            background-repeat: no-repeat; /* Prevent repetition */
+            height: 400px;
+            width: auto;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: 2px solid #2c3e50;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .generated-image-preview {
-            height: 400px; /* Fixed size for generated images */
-            width: 400px; /* Fixed size for generated images */
-            max-width: 100%; /* Ensure responsiveness */
+            height: 400px;
+            width: 400px;
+            max-width: 100%;
+            border: 2px solid #2c3e50;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
         }
         .hidden {
             display: none;
         }
+        .geek-text {
+            font-family: 'Roboto Mono', monospace;
+            letter-spacing: 1px;
+        }
+        .geek-input {
+            background: #fff;
+            border: 1px solid #2c3e50;
+            color: #333;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .geek-button {
+            background-color: #2c3e50;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 2px solid #2c3e50;
+        }
+        .geek-button:hover {
+            background-color: #fff;
+            color: #2c3e50;
+        }
+        .component-frame {
+            border: 2px solid #2c3e50;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 90%;
+        }
+        .footer {
+            margin-top: auto;
+            padding: 1rem;
+            background-color: #2c3e50;
+            color: #fff;
+            text-align: center;
+        }
+        .footer a {
+            color: #fff;
+            text-decoration: underline;
+        }
+        .footer a:hover {
+            text-decoration: none;
+        }
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 15px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #2c3e50;
+            cursor: pointer;
+        }
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #2c3e50;
+            cursor: pointer;
+        }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans">
+<body>
     <div class="container mx-auto px-4 py-8">
-        <h1 class="text-4xl font-bold text-center mb-8 text-indigo-700">Style Blender</h1>
+        <div class="component-frame">
+            <h1 class="text-4xl font-bold text-center mb-12 geek-text">Neural Style Blender v1.0</h1>
 
-        <form id="nstForm" class="mb-12">
-            <div class="grid md:grid-cols-2 gap-8 mb-12">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-semibold mb-4 text-indigo-600">Content image</h2>
-                    <div id="contentPreview" class="content-image-preview bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
-                        Preview content
+            <form id="nstForm" class="mb-12">
+                <div class="grid md:grid-cols-2 gap-8 mb-12">
+                    <div class="bg-white rounded-lg p-6 shadow-md">
+                        <h2 class="text-2xl font-semibold mb-4 geek-text">Content Image</h2>
+                        <div id="contentPreview" class="content-image-preview bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                            [Preview content]
+                        </div>
+                        <input type="file" id="contentImage" name="contentImage" accept="image/*" required class="mt-4 block w-full text-sm geek-input rounded-md p-2">
                     </div>
-                    <input type="file" id="contentImage" name="contentImage" accept="image/*" required class="mt-4 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+
+                    <div class="bg-white rounded-lg p-6 shadow-md">
+                        <h2 class="text-2xl font-semibold mb-4 geek-text">Style Image</h2>
+                        <div id="stylePreview" class="content-image-preview bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                            [Style preview]
+                        </div>
+                        <input type="file" id="styleImage" name="styleImage" accept="image/*" required class="mt-4 block w-full text-sm geek-input rounded-md p-2">
+                    </div>
                 </div>
 
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-2xl font-semibold mb-4 text-indigo-600">Style image</h2>
-                    <div id="stylePreview" class="content-image-preview bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
-                        Style preview
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 geek-text">Style Intensity</h2>
+                    <div class="flex justify-between mb-2">
+                        <span>Content</span>
+                        <span>Style</span>
                     </div>
-                    <input type="file" id="styleImage" name="styleImage" accept="image/*" required class="mt-4 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    <input type="range" id="styleSlider" class="slider" min="0" max="100" value="50">
+                    <div class="flex justify-between mt-2">
+                        <span id="contentValue">25</span>
+                        <span id="styleValue">45</span>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" id="generateButton" class="geek-button py-3 px-12 text-xl rounded-md">
+                        Generate Image
+                    </button>
+                </div>
+            </form>
+
+            <div id="loadingOverlay" class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center hidden">
+                <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                    <div class="spinner mb-4"></div>
+                    <p class="text-lg font-semibold geek-text">Processing...</p>
                 </div>
             </div>
 
-            <div class="text-center">
-                <button type="submit" id="generateButton" class="bg-green-500 text-white py-3 px-8 rounded-lg text-xl font-semibold hover:bg-green-600 transition duration-300 transform hover:scale-105">
-                    Generate image
-                </button>
-            </div>
-        </form>
-
-        <div id="loadingOverlay" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-            <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
-                <div class="spinner mb-4"></div>
-                <p class="text-lg font-semibold">Blending images...</p>
-            </div>
-        </div>
-
-        <div id="generatedImagesSection" class="hidden">
-            <h2 class="text-3xl font-bold text-center mb-8 text-indigo-700">Generated images</h2>
-            <div id="generatedImagesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Generated images will be inserted here -->
+            <div id="generatedImagesSection" class="hidden">
+                <h2 class="text-3xl font-bold text-center mb-8 geek-text">Blended Image</h2>
+                <div id="generatedImagesContainer" class="flex flex-wrap justify-center">
+                    <!-- Generated images will be inserted here -->
+                </div>
             </div>
         </div>
     </div>
+
+    <footer class="footer">
+        <p>View the project on <a href="https://github.com/miguemiguemigue/neural-style-blender" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+    </footer>
 
     <script>
         // Show image previews
@@ -99,6 +202,30 @@
         handleImagePreview('contentImage', 'contentPreview');
         handleImagePreview('styleImage', 'stylePreview');
 
+        // Handle slider
+        const slider = document.getElementById('styleSlider');
+        const contentValue = document.getElementById('contentValue');
+        const styleValue = document.getElementById('styleValue');
+
+        function updateSliderValues() {
+            const sliderValue = parseInt(slider.value);
+            let content, style;
+
+            if (sliderValue <= 50) {
+                content = 40 - (sliderValue / 50) * 30;
+                style = 10 + (sliderValue / 50) * 35;
+            } else {
+                content = 10 + ((100 - sliderValue) / 50) * 30;
+                style = 45 + ((sliderValue - 50) / 50) * 35;
+            }
+
+            contentValue.textContent = Math.round(content);
+            styleValue.textContent = Math.round(style);
+        }
+
+        slider.addEventListener('input', updateSliderValues);
+        updateSliderValues(); // Initialize values
+
         // Handle form submission
         document.getElementById('nstForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -109,6 +236,8 @@
 
             formData.append('contentImage', contentImage);
             formData.append('styleImage', styleImage);
+            formData.append('contentValue', contentValue.textContent);
+            formData.append('styleValue', styleValue.textContent);
 
             // Show loading overlay
             document.getElementById('loadingOverlay').classList.remove('hidden');
@@ -132,11 +261,18 @@
                     // Create and insert new image elements
                     images.forEach((image, index) => {
                         const imgElement = document.createElement('div');
-                        imgElement.className = 'generated-image-preview bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 shadow-md';
+                        imgElement.className = 'generated-image-preview bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 shadow-md';
                         imgElement.style.backgroundImage = `url(data:image/jpeg;base64,${image})`;
                         imgElement.innerHTML = `Image ${index + 1}`;
                         container.appendChild(imgElement);
                     });
+
+                    // Adjust layout based on number of images
+                    if (images.length === 1) {
+                        container.classList.add('justify-center');
+                    } else {
+                        container.classList.remove('justify-center');
+                    }
 
                     // Show the generated images section
                     document.getElementById('generatedImagesSection').classList.remove('hidden');
