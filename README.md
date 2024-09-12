@@ -55,8 +55,8 @@ To run the project, follow these steps:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/your-repository.git
-   cd your-repository
+   git clone https://github.com/miguemiguemigue/neural-style-blender.git
+   cd neural-style-blender
    ```
 
 2. **Install dependencies:**
