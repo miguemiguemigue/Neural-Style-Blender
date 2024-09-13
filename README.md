@@ -30,7 +30,7 @@ I've used the pre-trained VGG19 model to extract features from images. These fea
 
 ## Cost Function
 
-The cost function consists of two main components. Be careful, maths ahead:
+The cost function consists of two main components. Caution, maths ahead:
 
 1. **Content Cost**: Measures the difference between the content of the generated image and the content of the reference image. It is computed as:
 
