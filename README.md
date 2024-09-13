@@ -17,7 +17,7 @@ A cool approach here is how custom cost functions are used—not to optimize wei
 
 ## Introduction
 
-This project is based on the paper ["A Neural Algorithm of Artistic Style"](https://arxiv.org/abs/1508.06576). This paper propose an approach to artistic style transfer, where the style of one image can be applied to the content of another using neural networks.
+I built this based on the paper ["A Neural Algorithm of Artistic Style"](https://arxiv.org/abs/1508.06576). It proposes an approach to artistic style transfer, where the style of one image can be applied to the content of another using neural networks.
 
 ## Models and Features
 
@@ -30,7 +30,7 @@ I've used the pre-trained VGG19 model to extract features from images. These fea
 
 ## Cost Function
 
-The cost function consists of two main components:
+The cost function consists of two main components. Be careful, maths ahead:
 
 1. **Content Cost**: Measures the difference between the content of the generated image and the content of the reference image. It is computed as:
 
