@@ -1,6 +1,6 @@
 # Neural Style Blender
 
-This project implements Artistic Style Transfer using neural networks. I've implemented it both in Tensorflow and PyTorch. 
+This project implements Artistic Style Transfer using neural networks. I've implemented it both in Tensorflow and PyTorch. There's a little webpage and a Flask server to provide the functionality.
 
 A cool approach here is how custom cost functions are used—not to optimize weights, but rather to update the generated image itself during each iteration.
 
